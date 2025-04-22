@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Signup - Fitness Tracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body class="bg-gradient-to-br from-gray-900 via-gray-800 to-black text-gray-100 flex items-center justify-center min-h-screen p-6 relative overflow-hidden">
+
+  <!-- Background Animation -->
+  <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+    <lottie-player src="https://assets10.lottiefiles.com/packages/lf20_tljjahvd.json" background="transparent" speed="1" loop autoplay></lottie-player>
+  </div>
+
+  <div class="w-full max-w-md bg-gray-800 p-8 rounded-2xl shadow-2xl z-10 backdrop-blur-sm bg-opacity-80">
+    <h2 class="text-3xl font-extrabold mb-6 text-center text-blue-400 animate-fadeIn">Create Your Account</h2>
+
+    <!-- Google Sign-In -->
+    <div id="g_id_onload"
+         data-client_id="YOUR_GOOGLE_CLIENT_ID"
+         data-context="signup"
+         data-ux_mode="popup"
+         data-callback="handleGoogleSignup"
+         data-auto_prompt="false">
+    </div>
+    <div class="flex justify-center mb-6">
+      <div class="g_id_signin"
+           data-type="standard"
+           data-shape="pill"
+           data-theme="outline"
+           data-text="signup_with"
+           data-size="large"
+           data-logo_alignment="left">
+      </div>
+    </div>
+
+    <form onsubmit="handleSignup(event)" class="space-y-5 animate-slideInUp">
+      <div>
+        <label for="name" class="block text-sm font-semibold mb-1">Name</label>
+        <input type="text" id="name" required
+               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400" placeholder="Your name">
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-semibold mb-1">Email</label>
+        <input type="email" id="email" required
+               class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-md text-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder:text-gray-400" placeholder="you@example.com">
+        <p id="emailError" class="text-red-500 text-xs mt-1 hidden">Email already registered</p>
+      </div>
+
+      <div class="w-full max-w-md mx-auto">
+        <label for="password" class="block text-sm font-semibold text-white mb-1">Password</label>
+        
+        <div class="relative">
+          <input 
+            type="password" 
+            id="password" 
+            required 
+            minlength="6"
+            placeholder="Create a password"
+            oninput="checkPasswordStrength()"
+            class="w-full px-4 py-2 pr-10 bg-gray-700 border border-gray-600 rounded-md text-gray-100 placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+          />
+          
+          <!-- Toggle visibility button -->
+          <button 
+            type="button" 
+            onclick="togglePasswordVisibility()"
+            class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+            aria-label="Toggle password visibility"
+          >
+            👁️
+          </button>
+        </div>
+        
+        <p class="text-xs text-gray-400 mt-1">Minimum 6 characters</p>
+        <p id="passwordStrength" class="text-xs mt-1 font-medium text-white"></p>
+      </div>
+      
+      <button type="submit"
+              class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-bold py-2 px-4 rounded-md transition duration-200 shadow-md">
+        🚀 Sign Up
+      </button>
+    </form>
+
+    <p class="mt-6 text-sm text-center text-gray-400">
+      Already have an account?
+      <a href="login.html" class="text-blue-400 hover:underline font-medium">Login here</a>
+    </p>
+  </div>
+
+  <script>
+    function handleSignup(event) {
+      event.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const emailError = document.getElementById("emailError");
+
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      const userExists = users.some(user => user.email === email);
+
+      if (userExists) {
+        emailError.classList.remove('hidden');
+        return;
+      }
+
+      const newUser = { name, email, password };
+      users.push(newUser);
+      localStorage.setItem('users', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify({ name, email }));
+
+      event.target.reset();
+      alert(`🎉 Welcome, ${name}! Redirecting to login...`);
+      window.location.href = 'login.html';
+    }
+
+    function checkPasswordStrength() {
+      const password = document.getElementById("password").value;
+      const strengthText = document.getElementById("passwordStrength");
+      let strength = "";
+      let color = "text-gray-400";
+
+      if (password.length < 6) {
+        strength = "Too short";
+        color = "text-red-500";
+      } else if (/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d]).{8,}$/.test(password)) {
+        strength = "Strong password";
+        color = "text-green-400";
+      } else if (/^(?=.*[a-zA-Z])(?=.*\d).{6,}$/.test(password)) {
+        strength = "Moderate password";
+        color = "text-yellow-400";
+      } else {
+        strength = "Weak password";
+        color = "text-orange-400";
+      }
+
+      strengthText.textContent = strength;
+      strengthText.className = `text-xs mt-1 font-medium ${color}`;
+    }
+
+    function handleGoogleSignup(response) {
+      const userObject = jwt_decode(response.credential);
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+
+      const userExists = users.some(user => user.email === userObject.email);
+      if (!userExists) {
+        users.push({
+          name: userObject.name,
+          email: userObject.email,
+          password: "google_auth"
+        });
+        localStorage.setItem('users', JSON.stringify(users));
+      }
+      localStorage.setItem('currentUser', JSON.stringify({
+        name: userObject.name,
+        email: userObject.email
+      }));
+      alert(`🎉 Welcome, ${userObject.name}! Redirecting to login...`);
+      window.location.href = 'login.html';
+    }
+  </script>
+  
+  <!-- Similar structure as before, but add the password show/hide functionality and handle better error states -->
+
+<script>
+  function togglePasswordVisibility() {
+    const passwordField = document.getElementById('password');
+    const type = passwordField.type === 'password' ? 'text' : 'password';
+    passwordField.type = type;
+  }
+</script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@4.0.0/build/jwt-decode.min.js"></script>
+
+  <style>
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideInUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 1s ease-out forwards;
+    }
+    .animate-slideInUp {
+      animation: slideInUp 0.8s ease-out forwards;
+    }
+  </style>
+</body>
+</html>

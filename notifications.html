@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fitness Motivation Popup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #motivationPopup {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 5px;
+      font-weight: bold;
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    #motivationPopup.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen p-6">
+
+  <h1 class="text-3xl font-bold mb-6">Fitness Motivation</h1>
+  
+  <!-- Button to Start -->
+  <div class="mb-6">
+    <button id="startBtn" onclick="startNotifications()" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+      Start Notifications
+    </button>
+    <button id="muteBtn" onclick="muteNotifications()" class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 transition ml-4">
+      Mute Notifications
+    </button>
+  </div>
+
+  <!-- Motivation Popup -->
+  <div id="motivationPopup" class="hidden">
+    Keep going! You are doing great! 💪 #FitnessGoals
+  </div>
+
+  <script>
+    let notificationInterval;
+    let isMuted = false;
+
+    // Motivational messages
+    const messages = [
+      "Keep going! You're stronger than you think! 💪 #FitnessMotivation",
+      "One more rep! You're getting closer to your goal! 🚀 #FitnessGoals",
+      "Great job! Stay consistent and you'll see amazing results! 🌟 #FitnessJourney",
+      "Push yourself, you're capable of more than you know! 🔥 #StrongerEveryday",
+      "Believe in yourself, and the results will follow! 🏋️‍♀️ #FitnessMindset"
+    ];
+
+    // Function to show the motivational popup
+    function showMotivationPopup() {
+      if (isMuted) return;  // Do nothing if muted
+      
+      const popup = document.getElementById("motivationPopup");
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+      popup.textContent = randomMessage;
+      popup.classList.remove("hidden");
+      popup.classList.add("visible");
+
+      // Hide the popup after 3 seconds
+      setTimeout(() => {
+        popup.classList.remove("visible");
+        popup.classList.add("hidden");
+      }, 3000); // Hide after 3 seconds
+    }
+
+    // Start notifications every 5 seconds
+    function startNotifications() {
+      document.getElementById("startBtn").disabled = true;  // Disable Start button
+      document.getElementById("startBtn").textContent = "Notifications Started";  // Change button text
+
+      notificationInterval = setInterval(showMotivationPopup, 86400000);  // Show message every 5 seconds
+    }
+
+    // Mute notifications
+    function muteNotifications() {
+      clearInterval(notificationInterval);  // Stop the interval
+      document.getElementById("startBtn").disabled = false;  // Re-enable Start button
+      document.getElementById("startBtn").textContent = "Start Notifications";  // Reset button text
+      isMuted = true;  // Mute is activated
+    }
+  </script>
+
+</body>
+</html>
